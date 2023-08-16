@@ -1,3 +1,0 @@
-aider
-benchmark
-tests

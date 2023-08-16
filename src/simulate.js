@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+<<<<<<< HEAD
 require('dotenv').config();
 var ethers_1 = require("ethers");
 var abi_1 = require("./abi");
@@ -88,11 +89,105 @@ function main() {
                 case 7:
                     // Submit the bundles
                     _a.sent();
+=======
+var axios_1 = require("axios");
+var Arbitrage_1 = require("./Arbitrage");
+var ethers_1 = require("ethers");
+var ethers_provider_bundle_1 = require("@flashbots/ethers-provider-bundle");
+var markets_1 = require("./markets");
+// Define the required parameters
+var privateKey = 'PRIVATE_KEY';
+var providerUrl = 'https://eth-mainnet.g.alchemy.com/v2/jpWIUdqC9uBZm_8nb1t0hgYf9jCbh3Wi';
+var provider = new ethers_1.ethers.providers.JsonRpcProvider(providerUrl);
+var executorWallet = new ethers_1.Wallet(privateKey, provider);
+// Define an async function to initialize flashbotsProvider and other async operations
+function initialize() {
+    return __awaiter(this, void 0, void 0, function () {
+        var authSigner, flashbotsProvider, bundleExecutorContractAddress, bundleExecutorContractABI, bundleExecutorContract, arbitrage, uniswapEthDaiMarket, sushiswapEthUsdcMarket, uniswapDaiUsdcMarket, marketsByToken;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    authSigner = new ethers_1.Wallet(privateKey);
+                    return [4 /*yield*/, ethers_provider_bundle_1.FlashbotsBundleProvider.create(provider, {
+                            authSigner: authSigner,
+                            flashbotsAuthEndpoint: 'https://relay.flashbots.net',
+                        })];
+                case 1:
+                    flashbotsProvider = _a.sent();
+                    bundleExecutorContractAddress = '0x9451548B807e334247708f2F0d666486ead93487';
+                    bundleExecutorContractABI = '[{"inputs":[{"internalType":"address","name":"_executor","type":"address"}],"stateMutability":"payable","type":"constructor"},{"inputs":[{"internalType":"address payable","name":"_to","type":"address"},{"internalType":"uint256","name":"_value","type":"uint256"},{"internalType":"bytes","name":"_data","type":"bytes"}],"name":"call","outputs":[{"internalType":"bytes","name":"","type":"bytes"}],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_wethAmountToFirstMarket","type":"uint256"},{"internalType":"uint256","name":"_ethAmountToCoinbase","type":"uint256"},{"internalType":"address[]","name":"_targets","type":"address[]"},{"internalType":"bytes[]","name":"_payloads","type":"bytes[]"}],"name":"uniswapWeth","outputs":[],"stateMutability":"payable","type":"function"},{"stateMutability":"payable","type":"receive"}]';
+                    bundleExecutorContract = new ethers_1.Contract(bundleExecutorContractAddress, bundleExecutorContractABI, executorWallet);
+                    arbitrage = new Arbitrage_1.Arbitrage(executorWallet, flashbotsProvider, bundleExecutorContract);
+                    uniswapEthDaiMarket = new markets_1.UniswapMarket('0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f', ['ETH', 'DAI'], 'Uniswap');
+                    sushiswapEthUsdcMarket = new markets_1.SushiswapMarket('0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac', ['ETH', 'USDC'], 'Sushiswap');
+                    uniswapDaiUsdcMarket = new markets_1.UniswapMarket('0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f', ['DAI', 'USDC'], 'Uniswap');
+                    marketsByToken = {
+                        'ETH': [uniswapEthDaiMarket, sushiswapEthUsdcMarket],
+                        'DAI': [uniswapEthDaiMarket, uniswapDaiUsdcMarket],
+                        'USDC': [sushiswapEthUsdcMarket, uniswapDaiUsdcMarket],
+                    };
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
                     return [2 /*return*/];
             }
         });
     });
 }
+<<<<<<< HEAD
 main().catch(function (error) {
     console.error('An error occurred:', error);
 });
+=======
+var simulateTransaction = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var crossedMarkets, _i, crossedMarkets_1, crossedMarket, blockNumber, minerRewardPercentage, transactionData, TENDERLY_USER, TENDERLY_PROJECT, response, error_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 8, , 9]);
+                return [4 /*yield*/, arbitrage.evaluateMarkets(marketsByToken)];
+            case 1:
+                crossedMarkets = _a.sent();
+                _i = 0, crossedMarkets_1 = crossedMarkets;
+                _a.label = 2;
+            case 2:
+                if (!(_i < crossedMarkets_1.length)) return [3 /*break*/, 7];
+                crossedMarket = crossedMarkets_1[_i];
+                return [4 /*yield*/, provider.getBlockNumber()];
+            case 3:
+                blockNumber = _a.sent();
+                minerRewardPercentage = 0.05;
+                return [4 /*yield*/, arbitrage.takeCrossedMarkets([crossedMarket], blockNumber, minerRewardPercentage)];
+            case 4:
+                transactionData = _a.sent();
+                TENDERLY_USER = '0xmitch';
+                TENDERLY_PROJECT = 'mevbot';
+                return [4 /*yield*/, axios_1.default.post("https://api.tenderly.co/api/v1/account/".concat(TENDERLY_USER, "/project/").concat(TENDERLY_PROJECT, "/simulate"), transactionData, {
+                        headers: {
+                            'X-Access-Key': 'B4V7IdHRs3xf9mLIW5pjd',
+                        },
+                    })];
+            case 5:
+                response = _a.sent();
+                // Analyze the simulation results
+                console.log(response.data);
+                _a.label = 6;
+            case 6:
+                _i++;
+                return [3 /*break*/, 2];
+            case 7: return [3 /*break*/, 9];
+            case 8:
+                error_1 = _a.sent();
+                console.error(error_1);
+                return [3 /*break*/, 9];
+            case 9: 
+            // Call the simulateTransaction function
+            return [4 /*yield*/, simulateTransaction()];
+            case 10:
+                // Call the simulateTransaction function
+                _a.sent();
+                return [2 /*return*/];
+        }
+    });
+}); };
+// Call the initialize function
+initialize();
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5

@@ -1,4 +1,11 @@
+<<<<<<< HEAD
 {
    "spec_dir": "test",
    "spec_files": ["**/*[tT]est.ts"]
 }
+=======
+{
+   "spec_dir": "test",
+   "spec_files": ["**/*[tT]est.ts"]
+}
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5

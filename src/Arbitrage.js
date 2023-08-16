@@ -45,47 +45,77 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+<<<<<<< HEAD
 exports.Arbitrage = exports.calculateOptimalVolume = void 0;
+=======
+exports.Arbitrage = void 0;
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
 var ethers_1 = require("ethers");
 var addresses_1 = require("./addresses");
 var utils_1 = require("./utils");
 // Define the constant function market maker
+<<<<<<< HEAD
 var defaultValue = ethers_1.BigNumber.from("0");
+=======
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
 var CFMM = {
     reserves: {
         x: ethers_1.BigNumber.from(0),
         y: ethers_1.BigNumber.from(0), // Reserve of token Y
     },
+<<<<<<< HEAD
     tradingFunction: function (R) {
         if (this === null || this === void 0 ? void 0 : this.reserves) {
             R = R || this.reserves.x;
             return this.reserves ? R.mul(this.reserves.y) : defaultValue;
         }
         return ethers_1.BigNumber.from(0);
+=======
+    tradingFunction: function () {
+        // Invariant k = x * y
+        return CFMM.reserves.x.mul(CFMM.reserves.y);
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
     },
     tradingFee: ethers_1.BigNumber.from("3000"), // Fee in basis points (0.3%)
 };
 // Define acceptance condition for submitted trades
 var acceptTrade = function (R, deltaPlus, deltaMinus) {
+<<<<<<< HEAD
     var tradingFunctionResult = CFMM.tradingFunction(R.sub(CFMM.tradingFee.mul(deltaMinus)).sub(deltaPlus));
     var tradingFunctionResult2 = CFMM.tradingFunction(R);
     if (tradingFunctionResult.gte(tradingFunctionResult2) && R.sub(CFMM.tradingFee.mul(deltaMinus)).sub(deltaPlus).gte(0)) {
+=======
+    // φ(R − γ∆− − ∆+) ≥ φ(R)
+    var tradingFunctionResult = CFMM.tradingFunction(R - (CFMM.tradingFee * deltaMinus) - deltaPlus);
+    var tradingFunctionResult2 = CFMM.tradingFunction(R);
+    if (tradingFunctionResult >= tradingFunctionResult2 && (R - (CFMM.tradingFee * deltaMinus) - deltaPlus) >= 0) {
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
         return true;
     }
     return false;
 };
 // Define the dual decomposition method
 var dualDecomposition = function (referencePrices, objectiveFunction, penaltyVector) {
+<<<<<<< HEAD
     if (referencePrices === void 0) { referencePrices = []; }
+=======
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
     // Initialize trading set T
     var T = [];
     // Iterate through reference prices
     for (var i = 0; i < referencePrices.length; i++) {
         // Generate ∆
+<<<<<<< HEAD
         var deltaPlus = referencePrices[i].cumulativePrice;
         var deltaMinus = Math.min(referencePrices[i].cumulativePrice, 0);
         // Check acceptance condition
         if (acceptTrade(CFMM.reserves.x, deltaPlus, deltaMinus)) {
+=======
+        var deltaPlus = referencePrices[i];
+        var deltaMinus = Math.min(referencePrices[i], 0);
+        // Check acceptance condition
+        if (acceptTrade(CFMM.reserves, deltaPlus, deltaMinus)) {
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
             // Add ∆ to trading set T
             T.push([deltaPlus, deltaMinus]);
         }
@@ -95,10 +125,16 @@ var dualDecomposition = function (referencePrices, objectiveFunction, penaltyVec
     // Iterate through trading set T
     for (var i = 0; i < T.length; i++) {
         // Compute the objective function U(Ψ)
+<<<<<<< HEAD
         var objectiveFunctionResult = objectiveFunction(T[i][0]);
         // Compute the linear penalty in the objective
         var penaltyResult = penaltyVector[i] * nu;
         // Compute the linear penalty in the objective
+=======
+        var objectiveFunctionResult = objectiveFunction(T[i]);
+        // Compute the linear penalty in the objective
+        var penaltyResult = penaltyVector[i] * nu;
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
         // Update the dual variable ν
         nu = Math.max(nu, (objectiveFunctionResult - penaltyResult));
     }
@@ -108,17 +144,27 @@ var dualDecomposition = function (referencePrices, objectiveFunction, penaltyVec
 // Define the swap market arbitrage problem
 // Define the swap market arbitrage problem
 var swapMarketArbitrage = function (referencePrices, objectiveFunction, penaltyVector) {
+<<<<<<< HEAD
     if (referencePrices === void 0) { referencePrices = []; }
     // Initialize the dual variable ν
     var nu = 0;
     // Use bisection or ternary search to solve for the vector Ψ
     // Assuming that bisectionSearch accepts a number, not an array
+=======
+    // Initialize the dual variable ν
+    var nu = 0;
+    // Use bisection or ternary search to solve for the vector Ψ
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
     var psi = bisectionSearch(referencePrices, objectiveFunction, penaltyVector);
     // Iterate through the ∆i with i = 1, . . . , m
     for (var i = 0; i < referencePrices.length; i++) {
         // Compute the objective function U(Ψ)
+<<<<<<< HEAD
         // Use the i-th element from psi
         var objectiveFunctionResult = objectiveFunction(referencePrices[psi].cumulativePrice);
+=======
+        var objectiveFunctionResult = objectiveFunction(psi);
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
         // Compute the linear penalty in the objective
         var penaltyResult = penaltyVector[i] * nu;
         // Update the dual variable ν
@@ -139,7 +185,11 @@ var boundedLiquidityMarket = function (referencePrices, tradingFunction) {
 // Define the interface for swap markets
 var swapMarketInterface = function (inputVector) {
     // Compute the price of the swap
+<<<<<<< HEAD
     var swapPrice = CFMM.tradingFunction(inputVector);
+=======
+    var swapPrice = tradingFunction(inputVector);
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
     // Return the price of the swap
     return swapPrice;
 };
@@ -162,9 +212,15 @@ var bisectionSearch = function (referencePrices, objectiveFunction, penaltyVecto
     var tolerance = 1e-6;
     var psi;
     while (right - left > tolerance) {
+<<<<<<< HEAD
         var mid = Math.floor((left + right) / 2);
         var midValue = objectiveFunction(mid);
         var penaltyResult = penaltyVector[mid] * mid;
+=======
+        var mid = (left + right) / 2;
+        var midValue = objectiveFunction(mid);
+        var penaltyResult = penaltyVector[Math.round(mid)] * mid; // Updated line
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
         if (midValue > penaltyResult) {
             left = mid;
             psi = mid;
@@ -180,21 +236,32 @@ var newtonMethod = function (referencePrices, objectiveFunction, penaltyVector) 
     var tolerance = 1e-6;
     var maxIterations = 100;
     var iteration = 0;
+<<<<<<< HEAD
     var psi = 0; // Initial guess
     while (iteration < maxIterations) {
         var objectiveFunctionValue = objectiveFunction(referencePrices[psi].cumulativePrice);
+=======
+    var psi = referencePrices[0]; // Initial guess
+    while (iteration < maxIterations) {
+        var objectiveFunctionValue = objectiveFunction(psi);
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
         var penaltyResult = penaltyVector[psi] * psi;
         var difference = objectiveFunctionValue - penaltyResult;
         if (Math.abs(difference) < tolerance) {
             break;
         }
+<<<<<<< HEAD
         var objectiveFunctionDerivative = (objectiveFunction(referencePrices[psi + 1].cumulativePrice) - objectiveFunctionValue) / tolerance;
+=======
+        var objectiveFunctionDerivative = (objectiveFunction(psi + tolerance) - objectiveFunction(psi)) / tolerance;
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
         var penaltyDerivative = penaltyVector[psi];
         psi = psi - (difference / (objectiveFunctionDerivative - penaltyDerivative));
         iteration++;
     }
     return psi;
 };
+<<<<<<< HEAD
 // Example function to calculate the optimal trade volume
 function calculateOptimalVolume(buyFromMarket, sellToMarket, tokenAddress, profit) {
     return __awaiter(this, void 0, void 0, function () {
@@ -249,6 +316,116 @@ exports.calculateOptimalVolume = calculateOptimalVolume;
 function getGasPriceInfo(provider) {
     return __awaiter(this, void 0, void 0, function () {
         var latestBlock, blockNumber, blockGasPrices, i, block, transactions, totalGasPriceInBlock, transactionCountInBlock, _i, transactions_1, txHash, tx, avgGasPriceInBlock, currentGasPrice, totalGasPrice, i, avgGasPrice;
+=======
+function generateReferencePrices(marketsByToken) {
+    var referencePrices = [];
+    for (var tokenAddress in marketsByToken) {
+        var markets = marketsByToken[tokenAddress];
+        var cumulativePrice = 0;
+        var marketCount = 0;
+        for (var _i = 0, markets_1 = markets; _i < markets_1.length; _i++) {
+            var market = markets_1[_i];
+            cumulativePrice += market.getPrice(tokenAddress);
+            marketCount++;
+        }
+        referencePrices.push(cumulativePrice / marketCount); // Calculate the average price for each token
+    }
+    return referencePrices;
+}
+function generateObjectiveFunction(marketsByToken) {
+    return function (price) {
+        // Assuming the objective is to maximize the profit, we return the negative price
+        return -price;
+    };
+}
+function generatePenaltyVector(marketsByToken) {
+    var penaltyVector = [];
+    for (var tokenAddress in marketsByToken) {
+        var markets = marketsByToken[tokenAddress];
+        for (var _i = 0, markets_2 = markets; _i < markets_2.length; _i++) {
+            var market = markets_2[_i];
+            // Calculate the penalty for each market based on trading fees
+            var penalty = market.getTradingFee(tokenAddress);
+            penaltyVector.push(penalty);
+        }
+    }
+    return penaltyVector;
+}
+function findArbitrageTrades(arbitrageOpportunities, marketsByToken) {
+    return __awaiter(this, void 0, void 0, function () {
+        var crossedMarkets, tokenAddress, markets, i, j, buyFromMarket, sellToMarket, profit, optimalVolume;
+        return __generator(this, function (_a) {
+            crossedMarkets = [];
+            // Iterate through the given markets by token
+            for (tokenAddress in marketsByToken) {
+                markets = marketsByToken[tokenAddress];
+                // Calculate the arbitrage opportunities
+                for (i = 0; i < markets.length; i++) {
+                    for (j = i + 1; j < markets.length; j++) {
+                        buyFromMarket = markets[i];
+                        sellToMarket = markets[j];
+                        profit = sellToMarket.getPrice(tokenAddress) - buyFromMarket.getPrice(tokenAddress);
+                        if (profit > 0) {
+                            optimalVolume = calculateOptimalVolume(buyFromMarket, sellToMarket, tokenAddress, profit);
+                            // Create a CrossedMarketDetails object and add it to the list of arbitrage opportunities
+                            crossedMarkets.push({
+                                profit: ethers_1.BigNumber.from(profit),
+                                volume: optimalVolume,
+                                tokenAddress: tokenAddress,
+                                buyFromMarket: buyFromMarket,
+                                sellToMarket: sellToMarket
+                            });
+                        }
+                    }
+                }
+            }
+            // Sort the list of arbitrage opportunities based on the highest profit
+            crossedMarkets.sort(function (a, b) { return b.profit.sub(a.profit).toNumber(); });
+            return [2 /*return*/, crossedMarkets];
+        });
+    });
+}
+// Example function to calculate the optimal trade volume
+function calculateOptimalVolume(buyFromMarket, sellToMarket, tokenAddress, profit) {
+    // Determine the available liquidity in both markets involved in the arbitrage
+    var availableLiquidityBuy = buyFromMarket.getReserves(tokenAddress);
+    var availableLiquiditySell = sellToMarket.getReserves(tokenAddress);
+    // Set a maximum trade size limit to manage risk
+    var maxTradeSize = ethers_1.BigNumber.from(1000); // Set your desired maximum trade size limit
+    // Consider implementing a minimum profit threshold to ensure that the trade is worthwhile
+    var minProfitThreshold = ethers_1.BigNumber.from(1); // Set your desired minimum profit threshold
+    // Calculate the price impact of different trade volumes on both markets
+    var priceImpactBuy = buyFromMarket.getPriceImpact(tokenAddress, maxTradeSize);
+    var priceImpactSell = sellToMarket.getPriceImpact(tokenAddress, maxTradeSize);
+    // Account for trading fees, which are typically charged as a percentage of the trade volume
+    var tradingFeeBuy = buyFromMarket.getTradingFee(tokenAddress);
+    var tradingFeeSell = sellToMarket.getTradingFee(tokenAddress);
+    var optimalVolume = ethers_1.BigNumber.from(0);
+    var maxExpectedProfit = ethers_1.BigNumber.from(0);
+    // Calculate the expected profit for different trade volumes, taking into account price impact and trading fees
+    for (var volume = 1; volume <= maxTradeSize.toNumber(); volume++) {
+        var currentVolume = ethers_1.BigNumber.from(volume);
+        // Calculate the expected profit for the current trade volume
+        var expectedProfit = profit
+            .mul(currentVolume)
+            .sub(priceImpactBuy.mul(currentVolume))
+            .sub(priceImpactSell.mul(currentVolume))
+            .sub(tradingFeeBuy.mul(currentVolume))
+            .sub(tradingFeeSell.mul(currentVolume));
+        // Update the optimal trade volume if the expected profit is higher and meets the minimum profit threshold
+        if (expectedProfit.gt(maxExpectedProfit) && expectedProfit.gte(minProfitThreshold)) {
+            maxExpectedProfit = expectedProfit;
+            optimalVolume = currentVolume;
+        }
+    }
+    // Ensure that the calculated trade volume does not exceed the available liquidity in either market
+    optimalVolume = ethers_1.BigNumber.min(optimalVolume, availableLiquidityBuy, availableLiquiditySell);
+    return optimalVolume;
+}
+function getGasPriceInfo(provider) {
+    return __awaiter(this, void 0, void 0, function () {
+        var latestBlock, blockNumber, blockGasPrices, i, block, currentGasPrice, avgGasPrice;
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, provider.getBlock("latest")];
@@ -259,6 +436,7 @@ function getGasPriceInfo(provider) {
                     i = 0;
                     _a.label = 2;
                 case 2:
+<<<<<<< HEAD
                     if (!(i < 10)) return [3 /*break*/, 9];
                     return [4 /*yield*/, provider.getBlock(blockNumber - i)];
                 case 3:
@@ -294,16 +472,47 @@ function getGasPriceInfo(provider) {
                         totalGasPrice = totalGasPrice.add(blockGasPrices[i]);
                     }
                     avgGasPrice = totalGasPrice.div(ethers_1.BigNumber.from(blockGasPrices.length));
+=======
+                    if (!(i < 10)) return [3 /*break*/, 5];
+                    return [4 /*yield*/, provider.getBlock(blockNumber - i)];
+                case 3:
+                    block = _a.sent();
+                    blockGasPrices.push(block.gasPrice);
+                    _a.label = 4;
+                case 4:
+                    i++;
+                    return [3 /*break*/, 2];
+                case 5:
+                    currentGasPrice = blockGasPrices[0];
+                    avgGasPrice = ethers_1.BigNumber.from(blockGasPrices.reduce(function (a, b) { return a + b; }, 0)).div(blockGasPrices.length);
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
                     return [2 /*return*/, { currentGasPrice: currentGasPrice, avgGasPrice: avgGasPrice }];
             }
         });
     });
 }
+<<<<<<< HEAD
+=======
+function adjustGasPriceForTransaction(currentGasPrice, avgGasPrice, competingBundleGasPrice) {
+    return __awaiter(this, void 0, void 0, function () {
+        var gasPrice, adjustedGasPrice;
+        return __generator(this, function (_a) {
+            gasPrice = ethers_1.BigNumber.max(currentGasPrice, avgGasPrice).mul(110).div(100);
+            adjustedGasPrice = ethers_1.BigNumber.max(gasPrice, competingBundleGasPrice.add(1));
+            return [2 /*return*/, adjustedGasPrice];
+        });
+    });
+}
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
 function ensureHigherEffectiveGasPrice(transactionGasPrice, tailTransactionGasPrice) {
     return __awaiter(this, void 0, void 0, function () {
         var effectiveGasPrice;
         return __generator(this, function (_a) {
+<<<<<<< HEAD
             effectiveGasPrice = transactionGasPrice.gt(tailTransactionGasPrice) ? transactionGasPrice : tailTransactionGasPrice.add(1);
+=======
+            effectiveGasPrice = ethers_1.BigNumber.max(transactionGasPrice, tailTransactionGasPrice.add(1));
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
             return [2 /*return*/, effectiveGasPrice];
         });
     });
@@ -337,6 +546,7 @@ function monitorCompetingBundlesGasPrices(blocksApi) {
 }
 var Arbitrage = /** @class */ (function () {
     function Arbitrage(executorWallet, flashbotsProvider, bundleExecutorContract) {
+<<<<<<< HEAD
         // An internal state for storing bundle entries
         this.bundleEntries = [];
         this.generateReferencePrices = function (marketsByToken) {
@@ -373,6 +583,11 @@ var Arbitrage = /** @class */ (function () {
         // Binding this to instance methods
         this.evaluateMarkets = this.evaluateMarkets.bind(this);
         this.generateReferencePrices = this.generateReferencePrices.bind(this);
+=======
+        this.executorWallet = executorWallet;
+        this.flashbotsProvider = flashbotsProvider;
+        this.bundleExecutorContract = bundleExecutorContract;
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
     }
     Arbitrage.printCrossedMarket = function (crossedMarket) {
         var buyTokens = crossedMarket.buyFromMarket.tokens;
@@ -384,6 +599,7 @@ var Arbitrage = /** @class */ (function () {
             "".concat(crossedMarket.sellToMarket.protocol, "(").concat(crossedMarket.sellToMarket.marketAddress, ")\n") +
             "".concat(sellTokens[0], " => ").concat(sellTokens[1], "\n\n"));
     };
+<<<<<<< HEAD
     Arbitrage.prototype.findArbitrageTrades = function (arbitrageOpportunities, marketsByToken) {
         return __awaiter(this, void 0, void 0, function () {
             var crossedMarkets, referencePrices, _a, _b, _c, _i, tokenAddress, markets, i, _loop_1, j;
@@ -627,10 +843,13 @@ var Arbitrage = /** @class */ (function () {
             });
         });
     };
+=======
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
     Arbitrage.prototype.evaluateMarkets = function (marketsByToken) {
         return __awaiter(this, void 0, void 0, function () {
             var referencePrices, objectiveFunction, penaltyVector, arbitrageOpportunities;
             return __generator(this, function (_a) {
+<<<<<<< HEAD
                 switch (_a.label) {
                     case 0:
                         referencePrices = this.generateReferencePrices(marketsByToken);
@@ -644,19 +863,35 @@ var Arbitrage = /** @class */ (function () {
                         // Process the results and return the crossed market details
                         return [2 /*return*/, this.findArbitrageTrades(arbitrageOpportunities, marketsByToken)];
                 }
+=======
+                referencePrices = generateReferencePrices(marketsByToken);
+                objectiveFunction = generateObjectiveFunction(marketsByToken);
+                penaltyVector = generatePenaltyVector(marketsByToken);
+                arbitrageOpportunities = swapMarketArbitrage(referencePrices, objectiveFunction, penaltyVector);
+                // Process the results and return the crossed market details
+                return [2 /*return*/, findArbitrageTrades(arbitrageOpportunities, marketsByToken)];
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
             });
         });
     };
     Arbitrage.prototype.takeCrossedMarkets = function (bestCrossedMarkets, blockNumber, minerRewardPercentage) {
         return __awaiter(this, void 0, void 0, function () {
+<<<<<<< HEAD
             var _i, bestCrossedMarkets_1, bestCrossedMarket, buyCalls, inter, sellCallData, targets, payloads, minerReward, tempTransaction, estimateGas, error_2, gasBuffer, transaction, signedTransaction, bundleEntry, bundle;
+=======
+            var _i, bestCrossedMarkets_1, bestCrossedMarket, buyCalls, inter, sellCallData, targets, payloads, minerReward, transaction, estimateGas, gasBuffer, error_1, signedTransaction, bundle, gasPrice, blockHash, error_2;
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _i = 0, bestCrossedMarkets_1 = bestCrossedMarkets;
                         _a.label = 1;
                     case 1:
+<<<<<<< HEAD
                         if (!(_i < bestCrossedMarkets_1.length)) return [3 /*break*/, 14];
+=======
+                        if (!(_i < bestCrossedMarkets_1.length)) return [3 /*break*/, 15];
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
                         bestCrossedMarket = bestCrossedMarkets_1[_i];
                         console.log("Send this much WETH", bestCrossedMarket.volume.toString(), "get this much profit", bestCrossedMarket.profit.toString());
                         return [4 /*yield*/, bestCrossedMarket.buyFromMarket.sellTokensToNextMarket(addresses_1.WETH_ADDRESS, bestCrossedMarket.volume, bestCrossedMarket.sellToMarket)];
@@ -673,6 +908,7 @@ var Arbitrage = /** @class */ (function () {
                             payloads: payloads
                         });
                         minerReward = bestCrossedMarket.profit.mul(minerRewardPercentage).div(100);
+<<<<<<< HEAD
                         return [4 /*yield*/, this.bundleExecutorContract.populateTransaction.uniswapWeth(bestCrossedMarket.volume, minerReward, targets, payloads, { gasPrice: ethers_1.BigNumber.from(100000000) })];
                     case 4:
                         tempTransaction = _a.sent();
@@ -681,11 +917,26 @@ var Arbitrage = /** @class */ (function () {
                     case 5:
                         _a.trys.push([5, 7, , 8]);
                         return [4 /*yield*/, this.bundleExecutorContract.provider.estimateGas(tempTransaction)];
+=======
+                        return [4 /*yield*/, this.bundleExecutorContract.populateTransaction.uniswapWeth(bestCrossedMarket.volume, minerReward, targets, payloads, {
+                                gasPrice: ethers_1.BigNumber.from(0),
+                                gasLimit: estimateGas,
+                            })];
+                    case 4:
+                        transaction = _a.sent();
+                        estimateGas = void 0;
+                        gasBuffer = ethers_1.BigNumber.from(50000);
+                        _a.label = 5;
+                    case 5:
+                        _a.trys.push([5, 7, , 8]);
+                        return [4 /*yield*/, this.bundleExecutorContract.provider.estimateGas(transaction)];
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
                     case 6:
                         estimateGas = _a.sent();
                         console.log("Estimated gas for bundle execution:", estimateGas.toString());
                         return [3 /*break*/, 8];
                     case 7:
+<<<<<<< HEAD
                         error_2 = _a.sent();
                         console.error("Failed to estimate gas for bundle execution:", error_2.message);
                         return [3 /*break*/, 13];
@@ -710,10 +961,48 @@ var Arbitrage = /** @class */ (function () {
                         _i++;
                         return [3 /*break*/, 1];
                     case 14: return [2 /*return*/];
+=======
+                        error_1 = _a.sent();
+                        console.error("Failed to estimate gas for bundle execution:", error_1.message);
+                        return [3 /*break*/, 14];
+                    case 8:
+                        transaction.gasLimit = estimateGas.add(gasBuffer);
+                        return [4 /*yield*/, this.executorWallet.signTransaction(transaction)];
+                    case 9:
+                        signedTransaction = _a.sent();
+                        _a.label = 10;
+                    case 10:
+                        _a.trys.push([10, 13, , 14]);
+                        bundle = [{
+                                signedTransaction: signedTransaction,
+                                signer: this.executorWallet.address,
+                            }];
+                        return [4 /*yield*/, this.flashbotsProvider.getGasPrice()];
+                    case 11:
+                        gasPrice = _a.sent();
+                        return [4 /*yield*/, this.flashbotsProvider.sendBundle(bundle, blockNumber, {
+                                minTimestamp: 0,
+                                maxTimestamp: 0,
+                                revertingTxHashes: [],
+                            })];
+                    case 12:
+                        blockHash = _a.sent();
+                        console.log("Sent bundle with hash", blockHash);
+                        return [3 /*break*/, 14];
+                    case 13:
+                        error_2 = _a.sent();
+                        console.error("Failed to send bundle:", error_2.message);
+                        return [3 /*break*/, 14];
+                    case 14:
+                        _i++;
+                        return [3 /*break*/, 1];
+                    case 15: return [2 /*return*/];
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
                 }
             });
         });
     };
+<<<<<<< HEAD
     Arbitrage.prototype.adjustGasPriceForTransaction = function (currentGasPrice, avgGasPrice, competingBundleGasPrice) {
         return __awaiter(this, void 0, void 0, function () {
             var adjustedGasPrice, gasPriceIncreasePercentage, additionalGasPrice;
@@ -739,12 +1028,22 @@ var Arbitrage = /** @class */ (function () {
                 switch (_b.label) {
                     case 0:
                         _b.trys.push([0, 6, , 7]);
+=======
+    Arbitrage.prototype.submitBundleWithAdjustedGasPrice = function (bundle, blockNumber, blocksApi) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, currentGasPrice, avgGasPrice, competingBundlesGasPrices, competingBundleGasPrice, adjustedGasPrice, effectiveGasPrice, isValidBundleGas, currentTimestamp, maxTimestamp, targetBlockNumber, bundleSubmission, error_3;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _b.trys.push([0, 7, , 8]);
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
                         return [4 /*yield*/, getGasPriceInfo(this.flashbotsProvider)];
                     case 1:
                         _a = _b.sent(), currentGasPrice = _a.currentGasPrice, avgGasPrice = _a.avgGasPrice;
                         return [4 /*yield*/, monitorCompetingBundlesGasPrices(blocksApi)];
                     case 2:
                         competingBundlesGasPrices = _b.sent();
+<<<<<<< HEAD
                         competingBundleGasPrice = ethers_1.BigNumber.from(0);
                         for (i = 0; i < competingBundlesGasPrices.length; i++) {
                             currentPrice = ethers_1.BigNumber.from(competingBundlesGasPrices[i]);
@@ -762,6 +1061,17 @@ var Arbitrage = /** @class */ (function () {
                         }
                         return [4 /*yield*/, checkBundleGas(adjustedGasPrice)];
                     case 4:
+=======
+                        competingBundleGasPrice = ethers_1.BigNumber.from(Math.max.apply(Math, competingBundlesGasPrices));
+                        return [4 /*yield*/, adjustGasPriceForTransaction(currentGasPrice, avgGasPrice, competingBundleGasPrice)];
+                    case 3:
+                        adjustedGasPrice = _b.sent();
+                        return [4 /*yield*/, ensureHigherEffectiveGasPrice(adjustedGasPrice, currentGasPrice)];
+                    case 4:
+                        effectiveGasPrice = _b.sent();
+                        return [4 /*yield*/, checkBundleGas(effectiveGasPrice)];
+                    case 5:
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
                         isValidBundleGas = _b.sent();
                         if (!isValidBundleGas) {
                             console.error("Bundle gas is not valid");
@@ -773,6 +1083,7 @@ var Arbitrage = /** @class */ (function () {
                         return [4 /*yield*/, this.flashbotsProvider.sendBundle(bundle, targetBlockNumber, {
                                 minTimestamp: currentTimestamp,
                                 maxTimestamp: maxTimestamp,
+<<<<<<< HEAD
                             })];
                     case 5:
                         bundleSubmission = _b.sent();
@@ -783,6 +1094,19 @@ var Arbitrage = /** @class */ (function () {
                         console.error("Failed to submit bundle:", error_3.message);
                         return [3 /*break*/, 7];
                     case 7: return [2 /*return*/];
+=======
+                                gasPrice: effectiveGasPrice, // Use the effective gas price
+                            })];
+                    case 6:
+                        bundleSubmission = _b.sent();
+                        console.log("Bundle submitted:", bundleSubmission);
+                        return [3 /*break*/, 8];
+                    case 7:
+                        error_3 = _b.sent();
+                        console.error("Failed to submit bundle:", error_3.message);
+                        return [3 /*break*/, 8];
+                    case 8: return [2 /*return*/];
+>>>>>>> 4aa599175b4e823f381cb0498c1a10c7c5442af5
                 }
             });
         });

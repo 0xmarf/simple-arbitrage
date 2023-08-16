@@ -1,0 +1,18 @@
+{
+    "allow-32k": false,
+    "input-style": [
+        [
+            "",
+            "#9835bd"
+        ],
+        [
+            "prompt",
+            "#ffffff bold"
+        ],
+        [
+            "continuation",
+            "#ffffff bold"
+        ]
+    ],
+    "file-exclude-glob-list": []
+}

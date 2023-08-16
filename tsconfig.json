@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "es2017",
+    "lib": ["es2019", "dom"],
+    "skipLibCheck": true,
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "types": ["jasmine"],
+    "paths": {
+      "*": [
+        "node_modules/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*.ts"
+, "src/simulation.ts"  ],
+  "exclude": [
+    "node_modules",
+    "test",
+    "build",
+    "**/*.spec.ts"
+  ]
+}

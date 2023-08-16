@@ -1,0 +1,2 @@
+[console_scripts]
+mentat = mentat.app:run_cli
